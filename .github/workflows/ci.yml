@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Linux-Abhängigkeiten
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libxkbcommon-dev libwayland-dev
+      - run: cargo test --lib --no-default-features
+      - run: cargo build --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: png2iff-${{ matrix.os }}
+          path: |
+            target/release/png2iff
+            target/release/png2iff.exe
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup target add wasm32-unknown-unknown
+      - name: wasm-bindgen-cli passend zur Lockfile-Version installieren
+        run: |
+          V=$(awk '/name = "wasm-bindgen"$/{getline; gsub(/[^0-9.]/,"",$3); print $3; exit}' Cargo.lock)
+          cargo install wasm-bindgen-cli --version "$V"
+      - run: sh web/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: png2iff-web
+          path: web
