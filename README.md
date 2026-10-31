@@ -51,7 +51,10 @@ web/build.sh                       # oder: web\build.ps1 unter Windows
 python3 -m http.server -d web 8080 # lokal testen
 ```
 
-Den Ordner `web/` auf einen beliebigen HTTPS-Webspace legen (z. B. GitHub Pages). Auf dem iPhone/iPad in
+Den Ordner `web/` auf einen beliebigen HTTPS-Webspace legen. Für GitHub Pages baut und veröffentlicht
+`.github/workflows/pages.yml` die App bei jedem Push auf `main` automatisch (einmalig unter
+**Settings → Pages → Source: GitHub Actions** aktivieren); Adresse: `https://<benutzer>.github.io/<repo>/`.
+Auf dem iPhone/iPad in
 Safari öffnen und über **Teilen → Zum Home-Bildschirm** installieren; danach läuft die App offline.
 Die Konvertierung findet vollständig lokal im Browser statt, es werden keine Daten hochgeladen.
 
