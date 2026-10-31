@@ -1,4 +1,4 @@
-const CACHE = 'png2iff-v1';
+const CACHE = 'png2iff-v2';
 const FILES = [
   './', 'index.html', 'app.js', 'manifest.webmanifest', 'icon.svg', 'icon-180.png',
   'pkg/png2iff_core.js', 'pkg/png2iff_core_bg.wasm',

@@ -24,6 +24,7 @@
     input[type=range] { width: 100%; }
     button, .btn { font: inherit; padding: .6rem 1rem; border-radius: 8px; border: 0; background: var(--blue); color: #fff; cursor: pointer; display: inline-block; }
     button:disabled { opacity: .4; cursor: default; }
+    [hidden] { display: none !important; }
     #drop { border: 2px dashed #8887; border-radius: 12px; padding: 1.2rem; text-align: center; margin-bottom: 1rem; }
     #drop.over { border-color: var(--orange); background: #ff880022; }
     .previews { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
@@ -79,6 +80,7 @@
       </div>
       <p id="info"></p>
       <button id="save" disabled>Als IFF speichern</button>
+      <a id="dlLink" class="btn" hidden>Herunterladen</a>
     </section>
   </main>
   <script type="module" src="app.js"></script>

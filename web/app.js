@@ -49,6 +49,7 @@ function run() {
   if (!pngBytes) return;
   try {
     result?.free();
+    $('dlLink').hidden = true;
     result = convert_png(pngBytes, ...options());
     showError('');
     draw($('prev'), result.width(), result.height(), result.preview_rgba());
@@ -87,17 +88,48 @@ async function loadFile(file) {
   run();
 }
 
-function save() {
-  if (!result) return;
-  const blob = new Blob([result.iff()], { type: 'application/octet-stream' });
-  const url = URL.createObjectURL(blob);
+function download(bytes, name) {
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${fileName}.iff`;
+  a.download = name;
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  // Safari braucht die URL noch eine Weile; zusätzlich als Link anbieten, falls der Klick ignoriert wurde.
+  const link = $('dlLink');
+  link.href = url;
+  link.download = name;
+  link.textContent = `${name} herunterladen`;
+  link.hidden = false;
+  setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
+}
+
+async function save() {
+  if (!result) return;
+  const name = `${fileName}.iff`;
+  const bytes = result.iff();
+  const isTouch = navigator.maxTouchPoints > 1;
+  // iOS/iPadOS: Download-Attribut mit unbekanntem Dateityp wird oft ignoriert; das Teilen-Menü
+  // ("In Dateien sichern") funktioniert dort zuverlässig.
+  if (isTouch && navigator.canShare && navigator.share) {
+    const file = new File([bytes], name, { type: 'application/octet-stream' });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        showError('');
+        return;
+      } catch (e) {
+        if (e?.name === 'AbortError') return;
+        showError(`Teilen fehlgeschlagen (${e?.message ?? e}), versuche Download …`);
+      }
+    }
+  }
+  try {
+    download(bytes, name);
+  } catch (e) {
+    showError(`Speichern fehlgeschlagen: ${e?.message ?? e}`);
+  }
 }
 
 await init();
